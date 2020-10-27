@@ -13,20 +13,29 @@ public class Cliente2 {
 		Scanner entradaTeclado = new Scanner(System.in);
 		DataInputStream entrada = new DataInputStream(socket.getInputStream());
 		DataOutputStream salida = new DataOutputStream(socket.getOutputStream());
-		
-		System.out.print("Escriba Mensaje: ");
-		//salida.writeUTF(entradaTeclado.nextLine());
-		System.out.println(entrada.readUTF());
-		
+		System.out.print("Quiere comenzar a chatear: ");
+		String msj = entradaTeclado.nextLine();
+		HiloEscuchar hiloEscucha= new HiloEscuchar(entrada);
+		hiloEscucha.start();
+		while(!msj.equals("salir"))
+		{
+			//System.out.print("Escriba Mensaje: ");
+			salida.writeUTF(msj = entradaTeclado.nextLine());	
+		}
+		try {
+			hiloEscucha.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		entradaTeclado.close();
 		entrada.close();
 		socket.close();
-		entradaTeclado.close();
 
 	}
 
 	public static void main(String[] args) {
 		try {
-			new Cliente("localhost", 20000);
+			new Cliente2("localhost", 20000);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

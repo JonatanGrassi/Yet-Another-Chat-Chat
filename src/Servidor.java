@@ -12,7 +12,7 @@ public class Servidor {
 		int id = 0;
 		System.out.println("Server inicializando...");
 
-		for (int i = 1; i <= 20; i++) {
+		for (int i = 1; i <= 3; i++) {
 			Socket cliente = servidor.accept();
 
 			listaClientes.add(cliente);
@@ -28,6 +28,10 @@ public class Servidor {
 		}
 
 		System.out.println("Server Finalizado");
+		for (Socket cliente : listaClientes) {
+			cliente.close();
+		}
+		listaClientes.clear();
 		servidor.close();
 	}
 
