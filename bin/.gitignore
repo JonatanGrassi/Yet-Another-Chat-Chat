@@ -1,7 +1,3 @@
 bin
-/.gitignore
-/Servidor.class
-/Cliente.class
-/MiThread.class
-/HiloAtencionCliente.class
-/Cliente2.class
+/servidor/
+/cliente/
