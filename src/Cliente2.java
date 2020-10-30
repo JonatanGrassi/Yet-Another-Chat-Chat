@@ -1,4 +1,3 @@
-package cliente;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,7 +17,7 @@ public class Cliente2 {
 		String msj = entradaTeclado.nextLine();
 		HiloEscuchar hiloEscucha= new HiloEscuchar(entrada);
 		hiloEscucha.start();
-		while(!msj.equals("salir"))
+		while(!msj.equals("--salir"))
 		{
 			//System.out.print("Escriba Mensaje: ");
 			salida.writeUTF(msj = entradaTeclado.nextLine());	

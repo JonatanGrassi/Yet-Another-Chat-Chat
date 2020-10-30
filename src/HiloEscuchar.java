@@ -1,4 +1,3 @@
-package cliente;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -11,14 +10,14 @@ public class HiloEscuchar extends Thread {
 	 this.entrada = entrada;
 	}
 	
-	
 	@Override
 	public void run()
 	{	
 		try {
-			while(true)
-			{
-				System.out.println("\nMensaje de cliente2 es:  " + entrada.readUTF());
+			String msj;
+			while(!(msj = entrada.readUTF()).equals("--Salir"))
+			{	
+				System.out.println(msj);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
