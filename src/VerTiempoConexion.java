@@ -1,18 +1,18 @@
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
-public class Salir implements ComandosServer {
-
-	private ComandosServer siguiente;
-
-	public void establecerSiguiente(ComandosServer siguiente) {
+public class VerTiempoConexion implements ComandosServerSala {
+	
+	private ComandosServerSala siguiente;
+	
+	@Override
+	public void establecerSiguiente(ComandosServerSala siguiente) {
 		this.siguiente = siguiente;
-
+		
 	}
 
+	@Override
 	public void procesar(Paquete paquete) {
-		if (paquete.getMsj().equals("--Salir")) {
+		if (paquete.getMsj().equals("--verTiempoConexion")) {
 			try {
 				paquete.getSalida().writeUTF("Desconexion Finalizada:...");
 				paquete.getSalida().writeUTF("--Salir");
@@ -25,6 +25,7 @@ public class Salir implements ComandosServer {
 				e.printStackTrace();
 			}
 		} else
-			siguiente.procesar(paquete);
+			siguiente.procesar(paquete);	
 	}
+
 }

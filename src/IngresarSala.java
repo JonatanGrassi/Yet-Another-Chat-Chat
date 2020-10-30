@@ -19,12 +19,14 @@ public class IngresarSala implements ComandosServer {
 				msj = paquete.getEntrada().readUTF();
 				paquete.setSala(msj);
 				Servidor.agregarClienteSala(paquete);
-				paquete.getSalida().writeUTF("\n" + "Usted esta en la sala:" + msj);
 				
-				paquete.getSalida().writeUTF("Ingrese Comando: "
-						+ "\n" + "--Salir"
-						+ "\n" + "--ChatGlobal"
-						+ "\n" + "--ChatPrivado");
+				paquete.getSalida().writeUTF("\n" + "Usted esta en la sala: " + msj);
+//				paquete.getSalida().writeUTF("\n" + "Usted esta en la sala:" + msj);
+//				
+//				paquete.getSalida().writeUTF("Ingrese Comando: "
+//						+ "\n" + "--Salir"
+//						+ "\n" + "--ChatGlobal"
+//						+ "\n" + "--ChatPrivado");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

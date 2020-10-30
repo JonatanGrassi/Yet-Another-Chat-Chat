@@ -14,7 +14,7 @@ public class Servidor {
 		ServerSocket servidor = new ServerSocket(puerto);
 		int id = 0;
 		System.out.println("Server inicializando...");
-
+		servidor.setSoTimeout(8000000);
 		for (int i = 1; i <= 200; i++) {
 			Socket cliente = servidor.accept();
 
@@ -59,7 +59,7 @@ public class Servidor {
 	}
 
 
-	static public void agregarClienteSala(Paquete paqueteClient) {
+	public static void agregarClienteSala(Paquete paqueteClient) {
 		ArrayList<Paquete> listaPaquetesSala = new ArrayList<>();
 		
 		if (salas.containsKey(paqueteClient.getSala()))
@@ -68,6 +68,11 @@ public class Servidor {
 		listaPaquetesSala.add(paqueteClient);
 		salas.put(paqueteClient.getSala(), listaPaquetesSala);
 
+	}
+	
+	static ArrayList<Paquete>  darClientesDeSala(String sala)
+	{
+		return salas.get(sala);
 	}
 
 	static public void sacarCliente(int i) {

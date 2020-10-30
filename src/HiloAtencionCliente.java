@@ -2,10 +2,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Map;
 
 public class HiloAtencionCliente extends Thread {
@@ -14,11 +12,13 @@ public class HiloAtencionCliente extends Thread {
 	// private ArrayList<Socket> listaClientes = new ArrayList<>();
 	private int id;
 	private DataInputStream entrada;
+	private Date inicioConexion;
 	private DataOutputStream salida;
 	private ComandosServer comanSer;
 	private ComandosServerSala comanSerSal;
 	public HiloAtencionCliente(Socket socket, int id) {
 		this.cliente = socket;
+		this.inicioConexion = new Date();
 		this.id = id;
 		try {
 			this.entrada = new DataInputStream (cliente.getInputStream());
@@ -28,10 +28,12 @@ public class HiloAtencionCliente extends Thread {
 		}
 		this.comanSer = new Salir();
 		ComandosServer crearSala = new CrearSala();
+		ComandosServer ingresoSala = new IngresarSala();
 		comanSer.establecerSiguiente(crearSala);
+		crearSala.establecerSiguiente(ingresoSala);
 		
 		this.comanSerSal = new EnviarMensajeATodos();
-		ComandosServerSala timeConexion = new GetTiempoConexion();
+		ComandosServerSala timeConexion = new VerTiempoConexion();
 		comanSerSal.establecerSiguiente(timeConexion);
 		
 	}
@@ -44,6 +46,8 @@ public class HiloAtencionCliente extends Thread {
 	@Override
 	public void run() {
 		try {	
+				salida.writeUTF("Ingresando su nombre de usuario: ");
+				String nick = entrada.readUTF();
 				salida.writeUTF("Ingresando al lobby" + "\n");
 				for (Map.Entry<String, ArrayList<Paquete>> entry : Servidor.getSalas().entrySet()) {
 				    salida.writeUTF("Nombre Sala: " + entry.getKey() + "Usuarios conetados:" + entry.getValue().size());
@@ -54,8 +58,23 @@ public class HiloAtencionCliente extends Thread {
 				+ "\n" + "--IngresarAsala");
 				
 				String msj = entrada.readUTF();
-				Paquete paquete = new Paquete(cliente, msj, entrada, salida);
+				Paquete paquete = new Paquete(inicioConexion,cliente,nick,msj,entrada, salida);
 				comanSer.procesar(paquete);
+				
+				//salida.writeUTF("Ingrese Comando: "
+					//	+ "\n" + "--Salir"
+					//	+ "\n" + "--ChatPrivado");
+				
+				while(!(msj = entrada.readUTF()).equals("--Salir"))
+				{	
+					for (Paquete paqueteCliente : Servidor.darClientesDeSala(paquete.getSala())) {
+						if (!paqueteCliente.getCliente().equals(cliente) && paqueteCliente.getCliente().isConnected()) {
+							paqueteCliente.getSalida().writeUTF(paquete + msj);
+						}
+					}
+				}
+				
+				
 				Thread.sleep(5000000);
 //			while (!(msj = entrada.readUTF()).equals("--salir")) {
 //				for (Socket client : Servidor.getListaClientes()) {
