@@ -1,4 +1,5 @@
 package servidor;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,16 +11,19 @@ import java.util.Map;
 public class Servidor {
 
 	private static Map<String, ArrayList<Paquete>> salas = new HashMap<String, ArrayList<Paquete>>();
+	private static Map<String, ArrayList<String>> historialChat = new HashMap<String, ArrayList<String>>();
 
 	public Servidor(int puerto) throws IOException {
 		ServerSocket servidor = new ServerSocket(puerto);
 		System.out.println("Server inicializando...");
+
 		for (int i = 1; i <= 200; i++) {
 			Socket cliente = servidor.accept();
 
 			HiloAtencionCliente hc = new HiloAtencionCliente(cliente);
 			hc.start();
 		}
+
 		System.out.println("Server Finalizado");
 		servidor.close();
 	}
@@ -33,6 +37,14 @@ public class Servidor {
 					iterator.remove();
 			}
 		}
+	}
+
+	public static void agregarAHistorial(String sala, String msjSala) {
+		historialChat.get(sala).add(msjSala);
+	}
+
+	public static ArrayList<String> mostrarHistorial(String sala) {
+		return historialChat.get(sala);
 	}
 
 	public static boolean agregarClienteSala(Paquete paqueteClient, String salaAingresar) {
@@ -51,13 +63,19 @@ public class Servidor {
 				iterator.remove();
 		}
 	}
-
+	
+	public static boolean existeSala(String sala)
+	{	
+		return salas.containsKey(sala);
+	}
+	
 	public static void crearSala(Paquete paqueteClient, String salaAcrear) {
 		ArrayList<Paquete> client = new ArrayList<>();
 		client.add(paqueteClient);
-		if (!salas.containsKey(salaAcrear))
+		if (!salas.containsKey(salaAcrear)) {
 			salas.put(salaAcrear, client);
-		else
+			historialChat.put(salaAcrear, new ArrayList<String>());
+		} else
 			agregarClienteSala(paqueteClient, salaAcrear);
 	}
 
@@ -67,15 +85,5 @@ public class Servidor {
 
 	public static ArrayList<Paquete> darClientesDeSala(String sala) {
 		return salas.get(sala);
-	}
-
-	public static void main(String[] args) {
-
-		try {
-			new Servidor(20000);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 	}
 }

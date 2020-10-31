@@ -34,13 +34,14 @@ public class ChatPrivado implements ComandosServer {
 					}
 
 				if (exiteUsuario) {
-					paquete.getSalida().writeUTF("Para cambiar salir de chat privado ingrese [--salir]");
-					while (!(msj = paquete.getEntrada().readUTF()).equals("--salir"))
-						paqPrivado.getSalida().writeUTF(paquete + msj);
+					paquete.setEnChatPrivado(true);
+					paquete.getSalida().writeUTF("Para salir de chat privado ingrese [salir]");
+					while (!(msj = paquete.getEntrada().readUTF()).equals("salir"))
+						paqPrivado.getSalida().writeUTF("[Privado] " + paquete + msj);
 					paquete.setEnChatPrivado(false);
 				}
 				else
-					paquete.getSalida().writeUTF("Error el nombre no corresponde a un usuario conectado");
+					paquete.getSalida().writeUTF("Error,el nombre no corresponde a un usuario conectado");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

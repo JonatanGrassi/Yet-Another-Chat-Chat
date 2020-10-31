@@ -1,4 +1,5 @@
 package servidor;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -11,13 +12,12 @@ public class Paquete {
 	private static SimpleDateFormat formatFecha = new SimpleDateFormat(" [dd/MM/yyyy HH:mm:ss] ");
 	private Socket cliente;
 	private String salaActiva;
-	private boolean enChatPrivado;
+	private boolean enChatPrivado = false;
 	private Date inicioConexion;
 	private ArrayList<String> salas;
 	private String nick;
 	private DataInputStream entrada;
 	private DataOutputStream salida;
-	
 	
 	public Paquete(Date inicioConexion,Socket cliente,String nick,DataInputStream entrada,DataOutputStream salida) {
 		this.inicioConexion=inicioConexion;
@@ -68,14 +68,14 @@ public class Paquete {
         int horas = (int)(diff%86400)/3600;
         int minutos = (int)diff%3600/60;
         int segundos = (int)diff%60;
-        return "Tiempo activo de " + nick + " dias: " + dias + " horas: " + horas + " minutos: " + minutos + " segundos: " + segundos;
+        return String.format("Tiempo activo de %s: %02d dias %02d hh %02d mm %02d ss",nick,dias,horas,minutos,segundos);
 	}
 	
 	@Override
-	public String toString() {     
+	public String toString() {
+		
 		return formatFecha.format(new Date()) + "Mensaje de " + nick + " : " ;
 	}
-	//"sala: " + sala +
 	public String getNick() {
 		return nick;
 	}

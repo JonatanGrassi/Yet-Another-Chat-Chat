@@ -21,7 +21,7 @@ public class CrearSala implements ComandosServer {
 				Servidor.crearSala(paquete, msj);
 				paquete.getSalida().writeUTF("\n" + "Sala creada con exito ");
 				if (paquete.cantidadSalas() < 3) {
-					paquete.getSalida().writeUTF("Desea ingresar o crear otra sala:[y/n]");
+					paquete.getSalida().writeUTF("Desea ingresar o crear otra sala(y/n)");
 					resp = paquete.getEntrada().readUTF();
 				}
 			} catch (Exception e) {

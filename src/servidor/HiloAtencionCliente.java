@@ -1,4 +1,5 @@
 package servidor;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import comandos.CrearSala;
 import comandos.Default;
 import comandos.EnviarMsjAllSala;
 import comandos.IngresarSala;
+import comandos.ObtenerHistorial;
 import comandos.Salir;
 import comandos.SalirDeSala;
 import comandos.VerTiempoConexion;
@@ -25,19 +27,20 @@ public class HiloAtencionCliente extends Thread {
 	private Date inicioConexion;
 	private DataOutputStream salida;
 	private ComandosServer comanSer;
-	
+
 	private final String opcionesSala = "Ingrese Comando: " + "\n" + 
-										"1)-Salir"     + "\n" + 
-										"2)-CrearSala" + "\n" + 
-								        "3)-IngresarAsala";
-	
+										"1)-Salir" + "\n" + 
+										"2)-Crear sala" + "\n" +
+										"3)-Ingresar a sala";
+
 	private final String opcionesComandos = "Ingrese Comando: " + "\n" + 
-											"5)--ChatGeneral" + "\n" + 
-											"6)--ChatPrivado" + "\n" + 
-											"7)--verTiempoDeConexion" + "\n" +
-											"8)--volverAllobby" + "\n" + 
+											"5)--Chat general" + "\n" + 
+											"6)--Chat privado"+ "\n" + 
+											"7)--ver tiempo de conexion" + "\n" + 
+											"8)--volver al lobby" + "\n" + 
+											"9)--obtener historial" + "\n"+ 
 											"1)--Salir";
-	
+
 	public HiloAtencionCliente(Socket socket) {
 		this.cliente = socket;
 		this.inicioConexion = new Date();
@@ -56,6 +59,7 @@ public class HiloAtencionCliente extends Thread {
 		ComandosServer chatVerTiempoConexion = new VerTiempoConexion();
 		ComandosServer volverAllobby = new VolverLobby();
 		ComandosServer salirDeSala = new SalirDeSala();
+		ComandosServer obtenerHistorial = new ObtenerHistorial();
 
 		comanSer.establecerSiguiente(crearSala);
 		crearSala.establecerSiguiente(ingresoSala);
@@ -64,49 +68,54 @@ public class HiloAtencionCliente extends Thread {
 		chatPrivado.establecerSiguiente(chatVerTiempoConexion);
 		chatVerTiempoConexion.establecerSiguiente(volverAllobby);
 		volverAllobby.establecerSiguiente(salirDeSala);
-		salirDeSala.establecerSiguiente(chatComDefault);
+		salirDeSala.establecerSiguiente(obtenerHistorial);
+		obtenerHistorial.establecerSiguiente(chatComDefault);
 	}
 
 	@Override
 	public void run() {
 		try {
 			String msj, resultComando;
-			salida.writeUTF("Ingresando su nombre de usuario: ");
+			boolean existeSala = true;
+			salida.writeUTF("Ingrese su nombre de usuario: ");
 			String nick = entrada.readUTF();
 			Paquete paquete = new Paquete(inicioConexion, cliente, nick, entrada, salida);
-			do
-			{
-			salida.writeUTF("Lobby" + "\n");
-			for (Map.Entry<String, ArrayList<Paquete>> entry : Servidor.getSalas().entrySet()) {
-				salida.writeUTF("Nombre Sala: " + entry.getKey() + "Usuarios conetados:" + entry.getValue().size());
-			}
-
 			do {
-				salida.writeUTF(opcionesSala);
-				if(paquete.cantidadSalas() >= 1)
-					salida.writeUTF("4)-Salir de sala");
-				msj = entrada.readUTF();
-			} while ((resultComando = comanSer.procesar(paquete, msj)).equals("y"));
-
-			if (!resultComando.equals("Salir")) {
 				do {
-					String sala;
-					if (paquete.cantidadSalas() > 1) {
-						salida.writeUTF("\n" + "--ElegirSalaChat");
-						for (String salas : paquete.getSala())
-							salida.writeUTF("--" + salas);
-						sala = entrada.readUTF();
-						paquete.setSalaActiva(sala);
-						salida.writeUTF("!Listo para chater");
-					} else
-						sala = paquete.getSala().get(0);
-					paquete.setSalaActiva(sala);
+					salida.writeUTF("Lobby" + "\n");
+					for (Map.Entry<String, ArrayList<Paquete>> entry : Servidor.getSalas().entrySet()) {
+						salida.writeUTF(
+								"Nombre Sala: " + entry.getKey() + " Usuarios conetados:" + entry.getValue().size());
+					}
 
-					salida.writeUTF(opcionesComandos);
+					salida.writeUTF(opcionesSala);
+					if (paquete.cantidadSalas() >= 1)
+						salida.writeUTF("4)-Salir de sala");
 					msj = entrada.readUTF();
-				} while (!(resultComando=comanSer.procesar(paquete, msj)).equals("--VolverAlLobby"));
-			}
-			}while(!resultComando.equals("Salir"));
+				} while ((resultComando = comanSer.procesar(paquete, msj)).equals("y"));
+
+				if (!resultComando.equals("Salir")) {
+					do {
+						String sala;
+						if (paquete.cantidadSalas() > 1) {
+							do {
+								salida.writeUTF("\n" + "--ElegirSalaChat");
+								for (String salas : paquete.getSala())
+									salida.writeUTF("SALAS" + "\n" + salas);
+								sala = entrada.readUTF();
+								if (!(existeSala = Servidor.existeSala(sala)))
+									salida.writeUTF("Error,Sala invalida");
+							} while (!existeSala);
+							salida.writeUTF("!Listo para chatear");
+						} else
+							sala = paquete.getSala().get(0);
+						paquete.setSalaActiva(sala);
+
+						salida.writeUTF(opcionesComandos);
+						msj = entrada.readUTF();
+					} while (!(resultComando = comanSer.procesar(paquete, msj)).equals("--VolverAlLobby"));
+				}
+			} while (!resultComando.equals("Salir"));
 
 		} catch (IOException ex) {
 			ex.getStackTrace();

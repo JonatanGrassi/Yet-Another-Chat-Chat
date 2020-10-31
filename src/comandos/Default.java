@@ -13,7 +13,7 @@ public class Default implements ComandosServer {
 	@Override
 	public String procesar(Paquete paquete, String msj) {
 		try {
-			paquete.getSalida().writeUTF("Comando invalido ingrese nuevamente");
+			paquete.getSalida().writeUTF("Error,Comando invalido ingrese nuevamente");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
