@@ -1,4 +1,7 @@
+package comandos;
 import java.io.IOException;
+
+import servidor.Paquete;
 
 public class Default implements ComandosServer {
 

@@ -1,3 +1,6 @@
+package comandos;
+import servidor.Paquete;
+import servidor.Servidor;
 
 public class IngresarSala implements ComandosServer {
 

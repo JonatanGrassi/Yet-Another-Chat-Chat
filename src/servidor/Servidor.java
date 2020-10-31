@@ -1,3 +1,4 @@
+package servidor;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -64,7 +65,7 @@ public class Servidor {
 		return salas;
 	}
 
-	static ArrayList<Paquete> darClientesDeSala(String sala) {
+	public static ArrayList<Paquete> darClientesDeSala(String sala) {
 		return salas.get(sala);
 	}
 

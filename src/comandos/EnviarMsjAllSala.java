@@ -1,5 +1,9 @@
+package comandos;
 
 import java.io.IOException;
+
+import servidor.Paquete;
+import servidor.Servidor;
 
 public class EnviarMsjAllSala implements ComandosServer {
 

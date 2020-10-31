@@ -1,3 +1,4 @@
+package servidor;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -6,6 +7,17 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.Map;
 
+import comandos.ChatPrivado;
+import comandos.ComandosServer;
+import comandos.CrearSala;
+import comandos.Default;
+import comandos.EnviarMsjAllSala;
+import comandos.IngresarSala;
+import comandos.Salir;
+import comandos.SalirDeSala;
+import comandos.VerTiempoConexion;
+import comandos.VolverLobby;
+
 public class HiloAtencionCliente extends Thread {
 
 	private Socket cliente;
@@ -13,7 +25,19 @@ public class HiloAtencionCliente extends Thread {
 	private Date inicioConexion;
 	private DataOutputStream salida;
 	private ComandosServer comanSer;
-
+	
+	private final String opcionesSala = "Ingrese Comando: " + "\n" + 
+										"1)-Salir"     + "\n" + 
+										"2)-CrearSala" + "\n" + 
+								        "3)-IngresarAsala";
+	
+	private final String opcionesComandos = "Ingrese Comando: " + "\n" + 
+											"5)--ChatGeneral" + "\n" + 
+											"6)--ChatPrivado" + "\n" + 
+											"7)--verTiempoDeConexion" + "\n" +
+											"8)--volverAllobby" + "\n" + 
+											"1)--Salir";
+	
 	public HiloAtencionCliente(Socket socket) {
 		this.cliente = socket;
 		this.inicioConexion = new Date();
@@ -58,10 +82,7 @@ public class HiloAtencionCliente extends Thread {
 			}
 
 			do {
-				salida.writeUTF("Ingrese Comando: " + "\n" + 
-								"1)-Salir"     + "\n" + 
-								"2)-CrearSala" + "\n" + 
-						        "3)-IngresarAsala");
+				salida.writeUTF(opcionesSala);
 				if(paquete.cantidadSalas() >= 1)
 					salida.writeUTF("4)-Salir de sala");
 				msj = entrada.readUTF();
@@ -81,12 +102,7 @@ public class HiloAtencionCliente extends Thread {
 						sala = paquete.getSala().get(0);
 					paquete.setSalaActiva(sala);
 
-					salida.writeUTF("Ingrese Comando: " + "\n" + 
-									"5)--ChatGeneral" + "\n" + 
-									"6)--ChatPrivado" + "\n" + 
-									"7)--verTiempoDeConexion" + "\n" +
-									"8)--volverAllobby" + "\n" + 
-									"1)--Salir");
+					salida.writeUTF(opcionesComandos);
 					msj = entrada.readUTF();
 				} while (!(resultComando=comanSer.procesar(paquete, msj)).equals("--VolverAlLobby"));
 			}
