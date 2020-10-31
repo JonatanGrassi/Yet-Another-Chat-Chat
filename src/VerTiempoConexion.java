@@ -1,31 +1,28 @@
 import java.io.IOException;
 
-public class VerTiempoConexion implements ComandosServerSala {
-	
-	private ComandosServerSala siguiente;
-	
+public class VerTiempoConexion implements ComandosServer {
+
+	private ComandosServer siguiente;
+
 	@Override
-	public void establecerSiguiente(ComandosServerSala siguiente) {
+	public void establecerSiguiente(ComandosServer siguiente) {
 		this.siguiente = siguiente;
-		
+
 	}
 
 	@Override
-	public void procesar(Paquete paquete) {
-		if (paquete.getMsj().equals("--verTiempoConexion")) {
+	public String procesar(Paquete paquete,String msj) {
+		String resp= "salir";
+		if (msj.equals("7")) {
 			try {
-				paquete.getSalida().writeUTF("Desconexion Finalizada:...");
-				paquete.getSalida().writeUTF("--Salir");
-				paquete.getSalida().close();
-				paquete.getEntrada().close();
-				paquete.getCliente().close();
-				if (!paquete.getSala().equals("--"))
-					Servidor.eliminarClienteDeSala(paquete);
+				for (Paquete paqueteCliente : Servidor.darClientesDeSala(paquete.getSalaActiva()))
+					paquete.getSalida().writeUTF(paqueteCliente.getTiempoConexion());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} else
-			siguiente.procesar(paquete);	
+		return resp;
+		} 
+		else
+			return siguiente.procesar(paquete, msj);
 	}
-
 }

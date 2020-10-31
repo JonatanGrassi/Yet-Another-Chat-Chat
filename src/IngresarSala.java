@@ -1,6 +1,3 @@
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
 
 public class IngresarSala implements ComandosServer {
 
@@ -11,26 +8,29 @@ public class IngresarSala implements ComandosServer {
 
 	}
 
-	public void procesar(Paquete paquete) {
-		String msj;
-		if (paquete.getMsj().equals("--IngresarAsala")) {
+	public String procesar(Paquete paquete, String msj) {
+		String resp = "n";
+		if (msj.equals("3")) {
 			try {
 				paquete.getSalida().writeUTF("Ingrese nombre de la sala: ");
 				msj = paquete.getEntrada().readUTF();
-				paquete.setSala(msj);
-				Servidor.agregarClienteSala(paquete);
-				
-				paquete.getSalida().writeUTF("\n" + "Usted esta en la sala: " + msj);
-//				paquete.getSalida().writeUTF("\n" + "Usted esta en la sala:" + msj);
-//				
-//				paquete.getSalida().writeUTF("Ingrese Comando: "
-//						+ "\n" + "--Salir"
-//						+ "\n" + "--ChatGlobal"
-//						+ "\n" + "--ChatPrivado");
+				if (Servidor.agregarClienteSala(paquete, msj)) {
+					paquete.setSala(msj);
+					paquete.getSalida().writeUTF("\n" + "Usted esta ingreso a la sala: " + msj);
+					if (paquete.cantidadSalas() < 3) {
+						paquete.getSalida().writeUTF("\n" + "Desea ingresar o/crear otra sala [y/n]");
+						resp = paquete.getEntrada().readUTF();
+					}
+				} else {
+					paquete.getSalida().writeUTF("\n" + "Sala inexistente");
+					resp = "y";
+				}
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			return resp;
 		} else
-			siguiente.procesar(paquete);
+			return siguiente.procesar(paquete, msj);
 	}
 }

@@ -1,7 +1,3 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
 
 public class CrearSala implements ComandosServer {
 
@@ -12,21 +8,25 @@ public class CrearSala implements ComandosServer {
 
 	}
 
-	public void procesar(Paquete paquete) {
-		String msj;
-
-		if (paquete.getMsj().equals("--CrearSala")) {
+	public String procesar(Paquete paquete, String msj) {
+		String resp = "n";
+		if (msj.equals("2")) {
 			try {
 				paquete.getSalida().writeUTF("Ingrese nombre de la sala: ");
-				msj=paquete.getEntrada().readUTF();
+				msj = paquete.getEntrada().readUTF();
 				paquete.setSala(msj);
-				Servidor.agregarClienteSala(paquete);
+				Servidor.crearSala(paquete, msj);
 				paquete.getSalida().writeUTF("\n" + "Sala creada con exito ");
+				if (paquete.cantidadSalas() < 3) {
+					paquete.getSalida().writeUTF("Desea ingresar o crear otra sala:[y/n]");
+					resp = paquete.getEntrada().readUTF();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			return resp;
 		} else
-			siguiente.procesar(paquete);
+			return siguiente.procesar(paquete, msj);
 	}
 
 }

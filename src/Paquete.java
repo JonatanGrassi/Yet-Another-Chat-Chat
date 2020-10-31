@@ -2,36 +2,62 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 public class Paquete {
 	private static SimpleDateFormat formatFecha = new SimpleDateFormat(" [dd/MM/yyyy HH:mm:ss] ");
 	private Socket cliente;
+	private String salaActiva;
+	private boolean enChatPrivado;
 	private Date inicioConexion;
-	private String msj;
-	private String sala;
+	private ArrayList<String> salas;
 	private String nick;
 	private DataInputStream entrada;
 	private DataOutputStream salida;
 	
 	
-	public Paquete(Date inicioConexion,Socket cliente,String nick,String msj,DataInputStream entrada,DataOutputStream salida) {
+	public Paquete(Date inicioConexion,Socket cliente,String nick,DataInputStream entrada,DataOutputStream salida) {
 		this.inicioConexion=inicioConexion;
 		this.cliente = cliente;
-		this.msj = msj;
 		this.nick = nick;
 		this.entrada = entrada;
+		this.salas = new ArrayList<>();
 		this.salida = salida;
-		this.sala = "--";
 	}
 	
+	public boolean isEnChatPrivado() {
+		return enChatPrivado;
+	}
+	
+	
+	public void dejarSala(String sala)
+	{
+		salas.remove(sala);
+	}
+	
+	public void setEnChatPrivado(boolean enChatPrivado) {
+		this.enChatPrivado = enChatPrivado;
+	}
+
+
 	public Date getInicioConexion() {
 		return inicioConexion;
 	}
 	
+	public String getSalaActiva() {
+		return salaActiva;
+	}
+
+	public void setSalaActiva(String salaActiva) {
+		this.salaActiva = salaActiva;
+	}
+	
+	public Paquete()
+	{
+		
+	}
 	public String getTiempoConexion()
 	{
         Date tiempoActual = new Date();
@@ -41,14 +67,14 @@ public class Paquete {
         int horas = (int)(diff%86400)/3600;
         int minutos = (int)diff%3600/60;
         int segundos = (int)diff%60;
-        return "Tiempo activo: " + " dias: " + dias + " horas: " + horas + " minutos: " + minutos + " segundos: " + segundos;
+        return "Tiempo activo de " + nick + " dias: " + dias + " horas: " + horas + " minutos: " + minutos + " segundos: " + segundos;
 	}
 	
 	@Override
 	public String toString() {     
-		return "sala: " + sala + formatFecha.format(new Date()) + "Mensaje de " + nick + " : " ;
+		return formatFecha.format(new Date()) + "Mensaje de " + nick + " : " ;
 	}
-
+	//"sala: " + sala +
 	public String getNick() {
 		return nick;
 	}
@@ -57,20 +83,21 @@ public class Paquete {
 		this.nick = nick;
 	}
 
-	public String getMsj() {
-		return msj;
-	}
-
 	public Socket getCliente() {
 		return cliente;
 	}
-
-	public String getSala() {
-		return sala;
+	
+	public int cantidadSalas()
+	{
+		return salas.size(); 
+	}
+	
+	public ArrayList<String> getSala() {
+		return salas;
 	}
 
 	public void setSala(String sala) {
-		this.sala = sala;
+		salas.add(sala);
 	}
 
 	public DataInputStream getEntrada() {
@@ -91,12 +118,6 @@ public class Paquete {
 
 	public void setCliente(Socket cliente) {
 		this.cliente = cliente;
-	}
-
-	public void setMsj(String msj) {
-		this.msj = msj;
-	}
-	
-	
+	}	
 	
 }

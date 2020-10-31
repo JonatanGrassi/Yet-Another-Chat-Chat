@@ -1,6 +1,4 @@
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 public class Salir implements ComandosServer {
 
@@ -11,20 +9,23 @@ public class Salir implements ComandosServer {
 
 	}
 
-	public void procesar(Paquete paquete) {
-		if (paquete.getMsj().equals("--Salir")) {
+	public String procesar(Paquete paquete,String msj) {
+		String resp="Salir";
+		if (msj.equals("1")) {
 			try {
 				paquete.getSalida().writeUTF("Desconexion Finalizada:...");
 				paquete.getSalida().writeUTF("--Salir");
 				paquete.getSalida().close();
 				paquete.getEntrada().close();
 				paquete.getCliente().close();
-				if (!paquete.getSala().equals("--"))
-					Servidor.eliminarClienteDeSala(paquete);
+				if (paquete.cantidadSalas() >= 1)
+					Servidor.eliminarClienteDeSalas(paquete);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			return resp;
+		
 		} else
-			siguiente.procesar(paquete);
+			return siguiente.procesar(paquete,msj);
 	}
 }
